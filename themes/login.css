@@ -1,0 +1,77 @@
+@charset "UTF-8";
+
+div.logo{
+	display: none;
+	margin: 0 auto;
+	width: 150px;
+	margin-top: 100px;
+}
+img{
+	width: 150px;
+}
+p.thick{
+	color:#333;
+	text-align: center;
+	font-family: sans-serif;
+	font-weight: 500;
+	font-size: 20px;
+
+}
+div.button{
+	margin: 0 auto;
+	width: 320px;
+	text-align: center;
+	
+}
+.ui-input-text.ui-body-inherit.ui-corner-all.ui-shadow-inset.ui-input-has-clear{
+	width: 100%;
+	margin:0 auto;
+
+}
+#parents_login_button {
+	
+	font-size: 15px;
+}
+#children_login_button {
+	
+	font-size: 15px;
+}
+i.fa.fa-sign-in{
+	margin-left: 70px;
+	font-size: 20px;
+	color: #00a99d;
+}
+.signinlogo{
+	margin:0 auto;
+	width: 400px;
+	margin-top: 5px;
+	overflow: hidden;
+
+}
+button.ui-btn.ui-mini.ui-btn-inline{
+	
+	line-height: 30px;
+	
+	color: #00a99d;
+
+	margin-left: 15px;
+	font-style: bold !important;
+
+}
+.ui-page-theme-a a:visited, html .ui-bar-a a:visited, html .ui-body-a a:visited, html body .ui-group-theme-a a:visited{
+	color: #00a99d;
+}
+i.fa.fa-user{
+	color: #00a99d;
+	font-size: 20px;
+
+}
+.ui-page-theme-a .ui-btn, html .ui-bar-a .ui-btn, html .ui-body-a .ui-btn, html body .ui-group-theme-a .ui-btn, html head + body .ui-btn.ui-btn-a, .ui-page-theme-a .ui-btn:visited, html .ui-bar-a .ui-btn:visited, html .ui-body-a .ui-btn:visited, html body .ui-group-theme-a .ui-btn:visited, html head + body .ui-btn.ui-btn-a:visited{
+	color: #999;
+}
+.ui-page-theme-a .ui-btn.ui-btn-active, html .ui-bar-a .ui-btn.ui-btn-active, html .ui-body-a .ui-btn.ui-btn-active, html body .ui-group-theme-a .ui-btn.ui-btn-active, html head + body .ui-btn.ui-btn-a.ui-btn-active, .ui-page-theme-a .ui-checkbox-on:after, html .ui-bar-a .ui-checkbox-on:after, html .ui-body-a .ui-checkbox-on:after, html body .ui-group-theme-a .ui-checkbox-on:after, .ui-btn.ui-checkbox-on.ui-btn-a:after, .ui-page-theme-a .ui-flipswitch-active, html .ui-bar-a .ui-flipswitch-active, html .ui-body-a .ui-flipswitch-active, html body .ui-group-theme-a .ui-flipswitch-active, html body .ui-flipswitch.ui-bar-a.ui-flipswitch-active, .ui-page-theme-a .ui-slider-track .ui-btn-active, html .ui-bar-a .ui-slider-track .ui-btn-active, html .ui-body-a .ui-slider-track .ui-btn-active, html body .ui-group-theme-a .ui-slider-track .ui-btn-active, html body div.ui-slider-track.ui-body-a .ui-btn-active{
+	color: #333!important;
+}
+.ui-input-has-clear{
+	padding-right:0;
+}

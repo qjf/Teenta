@@ -1,0 +1,1153 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TeenTa</title>
+  <link rel="stylesheet" href="themes/greentheme.min.css" />
+  <link rel="stylesheet" href="themes/jquery.mobile.icons.min.css" />
+  <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile.structure-1.4.5.min.css" />
+
+  <link rel="stylesheet" type="text/css" href="css/jquery.datetimepicker.css"/>
+  <link rel="stylesheet" href="themes/customtheme.css"/>
+  <link rel="stylesheet" href="css/font-awesome.min.css">
+  <link href="css/mobiscroll.custom-2.15.0.min.css" rel="stylesheet" type="text/css" />
+
+  <link href="http://www.qijingfan.com/teentalogo57x57.png" rel="apple-touch-icon" size="57x57"/>
+  <link href="http://www.qijingfan.com/teentalogo76x76.png" rel="apple-touch-icon" sizes="76x76" />
+  <link href="http://www.qijingfan.com/teentalogo120x120.png" rel="apple-touch-icon" sizes="120x120" />
+  <link href="http://www.qijingfan.com/teentalogo180x180.png" rel="apple-touch-icon" sizes="180x180" />
+  <link href="http://www.qijingfan.com/teentalogo128x128.png" rel="icon" sizes="128x128" />
+
+  <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+  <script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+  <script type="text/javascript" src="http://maps.google.com/maps/api/js?key=AIzaSyCZF2lHFmEG62ZxmhmLSZoh8BQtgIDTyE8&sensor=true"></script>
+  <script type="text/javascript" src="js/gmaps.js"></script>
+  <script src="js/mobiscroll.custom-2.15.0.min.js" type="text/javascript"></script>
+  <script src="js/custom.js"></script>
+  <script src='https://cdn.firebase.com/js/client/2.0.4/firebase.js'></script>
+  <!--google map-->
+  <script type="text/javascript">
+    var users = [
+    ['img/sharon30px.png', 37.788587, -122.400958, 'Annie', 'Annie:109 Stevenson St San Francisco, CA <a href="#profile-Sharon">Profile</a>', true, "#FC7B7B", "#FCB3B3"],
+    ['img/Daniel30px.png', 37.787539, -122.403445, 'Daniel', 'Daniel: 2 3rd St San Francisco, CA <a href="#profile-Daniel">Profile<i class="fa fa-exclamation-circle" style="color:#FA7470"></i></a>', true, "#9668C4", "#AB93C4"],
+    ['img/kathy.png', 37.787138, -122.400496, 'Kathy', '116 New Montgomery St San Francisco, CA', false],
+    ['img/annie30px.png', 37.789345, -122.404567, 'Sharon', 'Sharon: 99 Robert Kirk Ln San Francisco, CA <a href="#profile-Annie">Profile</a>', true, "#FC7B7B", "#FCB3B3"],
+    ];
+    var geocoder = new google.maps.Geocoder();
+
+    function initialize() {
+      map = new GMaps({
+        el: '#map-canvas',
+        zoom: 16,
+        lat: 37.788600,
+        lng: -122.402006
+      });
+
+      for (var i = 0; i < users.length; i++) {
+                    // Draw circle
+                    if (users[i][5] === true) {
+                      var circle = map.drawCircle({
+                        lat: users[i][1],
+                        lng: users[i][2],
+                        radius: 80,
+                        strokeColor: users[i][6],
+                        strokeOpacity: 1,
+                        strokeWeight: 1,
+                        fillColor: users[i][7],
+                        fillOpacity: 0.6
+                      });
+
+                      map.addMarker({
+                        lat: users[i][1],
+                        lng: users[i][2],
+                        title: users[i][3],
+                        icon: users[i][0],
+                        animation: google.maps.Animation.DROP,
+                        draggable: true,
+                        fences: [circle],
+                        outside: function(m, f) {
+                          geocodePosition(m.getPosition(), m.title, "outside");
+                        },
+                        inside: function(m, f) {
+                          geocodePosition(m.getPosition(), m.title, "inside");
+                        },
+                        infoWindow: {
+                          content: users[i][4]
+                        }
+                      });
+                    } else {
+                      map.addMarker({
+                        lat: users[i][1],
+                        lng: users[i][2],
+                        title: users[i][3],
+                        icon: users[i][0],
+                        animation: google.maps.Animation.DROP,
+                        infoWindow: {
+                          content: users[i][4]
+                        }
+                      });
+                    }
+                  }
+                }
+                google.maps.event.addDomListener(window, 'load', initialize);
+
+                function geocodePosition(pos, title, user_pos) {
+                  geocoder.geocode({
+                    latLng: pos
+                  }, function(responses) {
+                    if (responses && responses.length > 0) {
+                      send_notify(title, responses[0].formatted_address, pos.lat(), pos.lng(), user_pos);
+                    } else {
+                      send_notify(title, 'Cannot determine address at this location.', pos.lat(), pos.lng(), user_pos);
+                    }
+                  });
+                }
+
+                function send_notify(title, add, lat, lng, user_pos) {
+                  $.ajax({
+                    url: 'notify.php',
+                    type: 'post',
+                    data: 'title=' + title + '&address=' + add + '&lat=' + lat + '&lng=' + lng + '&user_pos=' + user_pos,
+                    success: function(msg) {
+                      if (msg != 'ok') {
+                        alert('Error while sending notification.');
+                      }
+                    }
+                  });
+                }
+
+
+
+              </script>
+              <!--google map-->
+
+
+
+            </head>
+            <body>
+
+
+
+              <!--map-->
+              <div data-role="page" id="map">
+                <section>
+                  <div data-role="header" id="headertest" class="jqm-demos ui-responsive-panel" id="panel-responsive-page1" data-title="Panel responsive page" data-url="#map">
+                    <img src='img/teentalogo180x180.png' alt='Teenta logo' class="teenta-logo">
+                    <h3>Teenta</h3>
+                    <a href="add_child.html" onclick="window.location.href = 'add_child.html'" class='ui-btn-right add-child'><i class="fa fa-user-plus"></i></a>
+                  </div>
+
+                  <div data-role="content" id="map">
+                    <div id="map-canvas" ></div>
+                  </div>
+
+                  <ul data-role="listview" data-inset="true">
+                    <li><a href="#profile-Daniel">
+                      <img src="img/danielTodo.png">
+                      <h2>Daniel Johnson absent from football practice 3:00pm~4:00p <i class="fa fa-exclamation-circle" style="color:#FA7470"></i></h2>
+                      <p style="color:#FA7470">Current: 2 3rd St San Francisco, CA</p>
+                      <p style="color:#FA7470">Geofence: football practice</p>
+                    </a>
+                  </li>
+                  <li><a href="#profile-Annie">
+                    <img src="img/annie2.png">
+                    <h2>Sharon Johnson</h2>
+                    <p>current:99 Robert Kirk Ln San Francisco, CA</p></a>
+                  </li>
+                  <li><a href="#profile-Sharon">
+                    <img src="img/sharon.png">
+                    <h2>Annie Johnson</h2>
+                    <p>current:109 Stevenson St San Francisco, CA</p></a>
+                  </li>
+                </ul>
+                <div data-role="footer" id="bot_nav" data-position="fixed">
+                  <div data-role="navbar" data-iconpos="top">
+                    <ul id="nav_bar">
+                      <li><a href="index.html" onclick="window.location.href = 'index.html';" class='active'><i class="fa fa-street-view"></i><br> Location</a></li>
+                      <li><a href="#geofence"><i class="fa fa-map-marker"></i><br> Geofence</a></li>
+                      <li><a href="task_annie_to_do.html" onclick="window.location.href='task_annie_to_do.html';"><i class="fa fa-plus"></i><br> Add geofence</a></li>
+                      <li><a href="#setting"><i class="fa fa-cog"></i><br> Setting</a></li>
+                    </ul>
+                  </div><!-- /navbar -->
+                </div>       
+              </section><!--map-->
+
+            </div>
+            <div data-role="page" id="profile-Sharon">
+              <!--Sharon*profile-->
+              <section>
+                <div data-role="header" id="headertest" class="jqm-demos ui-responsive-panel" id="panel-responsive-page1" data-title="Panel responsive page" data-url="panel-responsive-page1">
+                 <h1>Profile</h1>
+                 <a href="index.html" onclick="window.location.href = 'index.html';" class="ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-carat-l ui-btn-icon-notext" id="annieprofilearrow"></a>
+               </div>
+
+               <div data-role="content" id="adminprofile">
+
+                <div class="ui-grid-a">
+                  <div class="ui-block-a">
+                    <img src="img/sharonTodo.png" class="profile-pic">
+                    <div class="imageCaption" style="margin-left:15px" >Sharon</div>
+                  </div>
+
+                  <div class="ui-block-b">
+                    <div class="info" ><p>Annie</p><a href="tel:1-408-555-5555" class="number">1-408-555-5555</a>  <p><a href="#task" class="task">Task</a><br><p><a href="https://www.google.com/maps/@37.7590042,-122.4222704,13z" class="getdirection" rel="external">Get Direction</a></p> </div>
+
+                  </div>
+
+                </div>
+                <hr>
+
+
+                <div class="ui-grid-b ">
+                  <div class="ui-block-a"><div class="ui-body ui-body-d" ><strong>Location</strong></div></div>
+                  <div class="ui-block-c"><div class="ui-body ui-body-d" ><strong>Updated</strong></div></div>
+
+                  <div class="ui-block-a"><div class="ui-body ui-body-d" >1-49 minna Street,San Francisco, CA<br>
+                  </div></div>
+                  <div class="ui-block-c"><div class="ui-body ui-body-d" >Just now</div></div>
+
+                  <div class="ui-block-a"><div class="ui-body ui-body-d" ><strong>Accuracy</strong></div></div>
+                  <div class="ui-block-c"><div class="ui-body ui-body-d" ><strong>Battery</strong></div></div>
+                  <div class="ui-block-a"><div class="ui-body ui-body-d" >within 33ft</div></div>
+                  <div class="ui-block-c"><div class="ui-body ui-body-d" >90%</div></div>
+                  <div class="ui-block-a"><div class="ui-body ui-body-d" ><strong>Reception</strong></div></div>
+                  <div class="ui-block-a"><div class="ui-body ui-body-d" >70%</div></div>
+
+                </div>
+              </div>
+              <div data-role="footer" id="bot_nav" data-position="fixed">
+                <div data-role="navbar" data-iconpos="top">
+                  <ul id="nav_bar">
+                    <li><a href="index.html" onclick="window.location.href = 'index.html';"><i class="fa fa-street-view"></i><br> Location</a></li>
+                    <li><a href="#geofence"><i class="fa fa-map-marker"></i><br> Geofence</a></li>
+                    <li><a href="task_annie_to_do.html" onclick="window.location.href='task_annie_to_do.html';"><i class="fa fa-plus"></i><br> Add geofence</a></li>                    
+                    <li><a href="#setting"><i class="fa fa-cog"></i><br> Setting</a></li>
+                  </ul>
+                </div><!-- /navbar -->
+              </div>  
+            </section><!--Annie*profile-->
+          </div>
+          <div data-role="page" id="profile-Daniel">
+            <!--Daniel*profile-->
+            <section>
+              <div data-role="header" id="headertest" class="jqm-demos ui-responsive-panel" id="panel-responsive-page1" data-title="Panel responsive page" data-url="panel-responsive-page1">
+                <h3>Profile</h3>
+                <a href="index.html" onclick="window.location.href = 'index.html';" class="ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-carat-l ui-btn-icon-notext" id="annieprofilearrow"></a>
+              </div>
+
+              <div data-role="content" id="adminprofile">
+
+                <div class="ui-grid-a">
+                  <div class="ui-block-a">
+                    <img src="img/danielTodo.png" class="profile-pic">
+                    <div class="imageCaption" style="margin-left:15px" >Daniel</div>
+                  </div>
+
+                  <div class="ui-block-b">
+                    <div class="info" ><p>Daniel</p><a href="tel:1-408-555-5555" class="number">1-408-555-5555</a>  <p><a href="#task" class="task">Task</a><br><p><a href="https://www.google.com/maps/@37.7590042,-122.4222704,13z" class="getdirection" rel="external">Get Direction</a></p> </div>
+
+                  </div>
+
+                </div>
+                <hr>
+
+
+                <div class="ui-grid-b ">
+                  <div class="ui-block-a"><div class="ui-body ui-body-d" ><strong>Location</strong></div></div>
+                  <div class="ui-block-c"><div class="ui-body ui-body-d" ><strong>Updated</strong></div></div>
+
+                  <div class="ui-block-a"><div class="ui-body ui-body-d" >2 3rd St San Francisco, CA<br>
+                  </div></div>
+                  <div class="ui-block-c"><div class="ui-body ui-body-d" >Just now</div></div>
+
+                  <div class="ui-block-a"><div class="ui-body ui-body-d" ><strong>Accuracy</strong></div></div>
+                  <div class="ui-block-c"><div class="ui-body ui-body-d" ><strong>Battery</strong></div></div>
+                  <div class="ui-block-a"><div class="ui-body ui-body-d" >within 33ft</div></div>
+                  <div class="ui-block-c"><div class="ui-body ui-body-d" >90%</div></div>
+                  <div class="ui-block-a"><div class="ui-body ui-body-d" ><strong>Reception</strong></div></div>
+                  <div class="ui-block-a"><div class="ui-body ui-body-d" >70%</div></div>
+
+                </div>
+                <hr>
+                <h5>While you are away...</h5>
+                <ul data-role="listview" data-inset="true">
+                  <li date-icon="false">Absent from football practice <i class="fa fa-minus-circle"> -$5 <span class
+                    ="ui-li-content">today 3:00pm</span></i>
+                  </li>
+
+                </ul>
+              </div>
+              <div data-role="footer" id="bot_nav" data-position="fixed">
+                <div data-role="navbar" data-iconpos="top">
+                  <ul id="nav_bar">
+                    <li><a href="index.html" onclick="window.location.href = 'index.html';"><i class="fa fa-street-view"></i><br> Location</a></li>
+                    <li><a href="#geofence"><i class="fa fa-map-marker"></i><br> Geofence</a></li>
+                    <li><a href="task_annie_to_do.html" onclick="window.location.href='task_annie_to_do.html';"><i class="fa fa-plus"></i><br> Add geofence</a></li>                    
+                    <li><a href="#setting"><i class="fa fa-cog"></i><br> Setting</a></li>
+
+                  </ul>
+                </div><!-- /navbar -->
+              </div>  
+
+            </section><!--Daniel*profile-->
+          </div>
+          <div data-role="page" id="profile-Annie">
+            <!--Annie*profile-->
+            <section >
+              <div data-role="header" id="headertest" class="jqm-demos ui-responsive-panel" id="panel-responsive-page1" data-title="Panel responsive page" data-url="panel-responsive-page1">
+
+                <h3>Profile</h3>
+                <a href="index.html" onclick="window.location.href = 'index.html';" class="ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-carat-l ui-btn-icon-notext" id="sharonprofilearrow"></a>
+              </div>
+
+              <div data-role="content" id="adminprofile">
+
+                <div class="ui-grid-a">
+                  <div class="ui-block-a">
+                    <img src="img/annieTodo.png" class="profile-pic">
+                    <div class="imageCaption" style="margin-left:15px" >Sharon</div>
+                  </div>
+
+                  <div class="ui-block-b">
+                    <div class="info" ><p>Sharon</p><a href="tel:1-408-555-5555" class="number">1-408-555-5555</a>  <p><a href="#schedule" class="schedule">Task</a><br><p><a href="https://www.google.com/maps/@37.7590042,-122.4222704,13z" class="getdirection" rel="external">Get Direction</a></p> </div>
+
+                  </div>
+
+                </div>
+                <hr>
+
+
+                <div class="ui-grid-b ">
+                  <div class="ui-block-a"><div class="ui-body ui-body-d" ><strong>Location</strong></div></div>
+                  <div class="ui-block-c"><div class="ui-body ui-body-d" ><strong>Updated</strong></div></div>
+
+                  <div class="ui-block-a"><div class="ui-body ui-body-d" >1-49 minna Street,San Francisco, CA<br>
+                  </div></div>
+                  <div class="ui-block-c"><div class="ui-body ui-body-d" >Just now</div></div>
+
+                  <div class="ui-block-a"><div class="ui-body ui-body-d" ><strong>Accuracy</strong></div></div>
+                  <div class="ui-block-c"><div class="ui-body ui-body-d" ><strong>Battery</strong></div></div>
+                  <div class="ui-block-a"><div class="ui-body ui-body-d" >within 33ft</div></div>
+                  <div class="ui-block-c"><div class="ui-body ui-body-d" >90%</div></div>
+                  <div class="ui-block-a"><div class="ui-body ui-body-d" ><strong>Reception</strong></div></div>
+                  <div class="ui-block-c"><div class="ui-body ui-body-d" ><strong>See History</strong></div></div>
+                  <div class="ui-block-a"><div class="ui-body ui-body-d" >70%</div></div>
+
+                </div>
+                <div data-role="footer" id="bot_nav" data-position="fixed">
+                  <div data-role="navbar" data-iconpos="top">
+                    <ul id="nav_bar">
+                      <li><a href="index.html" onclick="window.location.href = 'index.html';"><i class="fa fa-street-view"></i><br> Location</a></li>
+                      <li><a href="#geofence"><i class="fa fa-map-marker"></i><br> Geofence</a></li>
+                      <li><a href="task_annie_to_do.html" onclick="window.location.href='task_annie_to_do.html';"><i class="fa fa-plus"></i><br> Add geofence</a></li>                      
+                      <li><a href="#setting"><i class="fa fa-cog"></i><br> Setting</a></li>
+
+                    </ul>
+                  </div><!-- /navbar -->
+                </div>
+
+              </section><!--Sharon*profile-->
+            </div>
+            <div data-role="page" id="geofence">
+              <!--#geofence-->
+              <section >
+                <div data-role="header" id="headertest" class="jqm-demos ui-responsive-panel" id="panel-responsive-page1" data-title="Panel responsive page" data-url="panel-responsive-page1">
+                 <img src='img/teentalogo180x180.png' alt='Teenta logo' class="teenta-logo">
+                 <h3>TeenTa</h3>
+                 <a href="add_child.html" onclick="window.location.href = 'add_child.html'" class='ui-btn-right add-child'><i class="fa fa-user-plus"></i></a>
+               </div>
+
+               <div data-role="content" >
+                <div data-role="tabs" id="geofence-tabs">
+                  <div id="nav-wrapper" class="children-search">
+                    <input id="search" value="" placeholder="Search name..." type="search">
+                    <div data-role="navbar">
+                      <ul>
+                        <li><a href="#geofence-annie" data-ajax="false" class="ui-btn-active">Annie</a><div class="arrow-up"></div></li>
+                        <li><a href="#geofence-daniel" data-ajax="false">Daniel</a><div class="arrow-up"></div></li>
+                        <li><a href="#geofence-sharon" data-ajax="false">Sharon</a><div class="arrow-up"></div></li>
+                      </ul>
+                    </div>
+                  </div>
+                  <div id="geofence-annie" class="ui-body-d ui-content centeralgin">
+                    <img src="img/sharonTodo.png">
+                    <p style="margin:0" >Annie</p>
+                    <div data-role="tabs" >
+                      <div data-role="navbar" class="sec-navbar">
+                        <ul class="kidstodo">
+                          <li><a href="#geofence-annie-place"><i class="fa fa-home"></i><br />Places</a></li>
+                          <li><a href="#geofence-annie-study" ><i class="fa fa-book"></i><br />Study</a></li>
+                          <li><a href="#geofence-annie-active" ><i class="fa fa-futbol-o"></i><br />Activities</a></li>
+                          <li><a href="#geofence-annie-fun" ><i class="fa fa-rocket"></i><br/>Fun</a></li>
+                        </ul>
+                      </div>
+                      <div id="geofence-annie-place">
+                        <ul data-role="listview" data-inset="true">
+                          <li>
+                            <a href="#">
+                              <h2>Dance class&nbsp;<i class="fa fa-exclamation-circle" style="color:#FA7470"></i></h2>
+                              <p style="color:#FA7470">Absent from football practice 3:00pm~4:00p</p>
+                              <p style="color:#FA7470">Geofence name: football practice</p>
+                              <p style="color:#FA7470">Location: 236 12th Ave, San Francisco</p>
+
+                            </a>
+                          </li>
+                          <li><a href="#"><h2>Swimming Class</h2><p>Geofence name:swim team</p><p>Location:875 Hyde Street, SF</p></a></li>
+                          <li><a href="#"><h2>Home</h2><p>Geofence name:home</p><p>Location:645 Bush Street, SF</p></a></li>
+                        </ul>
+                      </div>
+                      <div id="geofence-annie-study">
+                        <ul data-role="listview" data-inset="true">
+                          <li>
+                            <a href="#">
+                              <h2>School</h2>
+                              <p>Geofence name: Study group</p>
+                              <p>Location: 236 12th Ave, San Francisco</p>
+
+                            </a>
+                          </li>
+                          <li><a href="#"><h2>Abbey's house</h2><p>Geofence name: Study with Abbey</p><p>Location: 875 Hyde Street, SF</p></a></li>
+                          <li><a href="#"><h2>Uncle's house</h2><p>Geofence name: Visit Uncle</p><p>Location: 645 Bush Street, SF</p></a></li>
+                        </ul>
+                      </div>
+                      <div id="geofence-annie-active">
+                        <ul data-role="listview" data-inset="true">
+                          <li>
+                            <a href="#">
+                              <h2>Golden gate park<i class="fa fa-exclamation-circle" style="color:#FA7470"></i></h2>
+                              <p style="color:#FA7470">Out of geofence 3:00pm~4:00p</p>
+                              <p style="color:#FA7470">Location: 1900 geary ave, San francisco (3:00pm-4:00pm)</p>
+                            </a>
+                          </li>
+                          <li><a href="#"><h2>Movie:Big Hero 6</h2><p>Geofence name:AMC </p><p>Location:4th&Mission Street, SF</p></a></li>
+                          <li><a href="#"><h2>Birthday Party</h2><p>Geofence name:Lily's house</p><p>Location:645 Turk Street, SF</p></a></li>
+                        </ul>
+                      </div>
+                      <div id="geofence-annie-fun">
+                        <ul data-role="listview" data-inset="true">
+                          <li>
+                            <a href="#">
+                              <h2>Shopping with friends</h2>
+                              <p >Geofence:Nordstorm shopping mall</p>
+                              <p >Location:845 market street, San francisco</p>
+                            </a>
+                          </li>
+                          <li><a href="#"><h2>Play Just Dance in the mall</h2><p>Geofence name:Westfiled Shopping mall</p><p>Location:845 market street, SF</p></a></li>
+                          <li><a href="#"><h2>Dinner:Abbey+Lily</h2><p>Geofence name:Osha Thai </p><p>Location:54 2nd Street, SF</p></a></li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                  <div id="geofence-daniel" class="ui-body-d ui-content centeralgin">
+                    <img src="img/danielTodo.png">
+                    <p style="margin:0" >Daniel</p>
+                    <div data-role="tabs" >
+                      <div data-role="navbar" class="sec-navbar">
+                        <ul class="kidstodo">
+                          <li><a href="#geofence-daniel-place"><i class="fa fa-home"></i><br />Places</a></li>
+                          <li><a href="#geofence-daniel-study" ><i class="fa fa-book"></i><br />Study</a></li>
+                          <li><a href="#geofence-daniel-active" ><i class="fa fa-futbol-o"></i><br />Activities</a></li>
+                          <li><a href="#geofence-daniel-fun" ><i class="fa fa-rocket"></i><br/>Fun</a></li>
+                        </ul>
+                      </div>
+                      <div id="geofence-daniel-place">
+                        <ul data-role="listview" data-inset="true">
+                          <li>
+                            <a href="#">
+                              <h2>School&nbsp;<i class="fa fa-exclamation-circle" style="color:#FA7470"></i></h2>
+                              <p style="color:#FA7470">Absent from football practice 3:00pm~4:00p</p>
+                              <p style="color:#FA7470">Geofence name: football practice</p>
+                              <p style="color:#FA7470">Location: 236 12th Ave, San Francisco</p>
+                            </a>
+                          </li>
+                          <li><a href="#"><h2>Swimming Class</h2><p>Geofence:swim team</p><p>Location:875 Hyde Street, SF</p></a></li>
+                          <li><a href="#"><h2>Home</h2><p>Geofence name:home</p><p>Location:645 Bush Street, SF</p></a></li>
+                        </ul>
+                      </div>
+                      <div id="geofence-daniel-study">
+                        <ul data-role="listview" data-inset="true">
+                          <li>
+                            <a href="#">
+                              <h2>School</h2>
+                              <p>Geofence: Study group</p>
+                              <p>Location: 236 12th Ave, San Francisco</p>
+                            </a>
+                          </li>
+                          <li><a href="#"><h2>Abbey's house</h2><p>Geofence name: Study with Abbey</p><p>Location: 875 Hyde Street, SF</p></a></li>
+                          <li><a href="#"><h2>Uncle's house</h2><p>Geofence name: Visit Uncle</p><p>Location: 645 Bush Street, SF</p></a></li>
+                        </ul>
+                      </div>
+                      <div id="geofence-daniel-active">
+                        <ul data-role="listview" data-inset="true">
+                          <li>
+                            <a href="#">
+                              <h2>Golden gate park<i class="fa fa-exclamation-circle" style="color:#FA7470"></i></h2>
+                              <p style="color:#FA7470">Out of geofence 3:00pm~4:00p</p>
+                              <p style="color:#FA7470">Location: 1900 geary ave, San francisco (3:00pm-4:00pm)</p>
+                            </a>
+                          </li>
+                          <li><a href="#"><h2>Movie:Big Hero 6</h2><p>Geofence name:AMC </p><p>Location:4th&Mission Street, SF</p></a></li>
+                          <li><a href="#"><h2>Birthday Party</h2><p>Geofence name:Lily's house</p><p>Location:645 Turk Street, SF</p></a></li>
+                        </ul>
+                      </div>
+                      <div id="geofence-daniel-fun">
+                        <ul data-role="listview" data-inset="true">
+                          <li>
+                            <a href="#">
+                              <h2>Shopping with friends</h2>
+                              <p >Geofence:Nordstorm shopping mall</p>
+                              <p >Location:845 market street, San francisco</p>
+                            </a>
+                          </li>
+                          <li><a href="#"><h2>Play Just Dance in the mall</h2><p>Geofence name:Westfiled Shopping mall</p><p>Location:845 market street, SF</p></a></li>
+                          <li><a href="#"><h2>Dinner:Abbey+Lily</h2><p>Geofence name:Osha Thai </p><p>Location:54 2nd Street, SF</p></a></li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                  <div id="geofence-sharon" class="ui-body-d ui-content centeralgin">
+                    <img src="img/annieTodo.png">
+                    <p style="margin:0" >Sharon</p>
+                    <div data-role="tabs" >
+                      <div data-role="navbar" class="sec-navbar">
+                        <ul class="kidstodo">
+                          <li><a href="#geofence-sharon-place"><i class="fa fa-home"></i><br />Places</a></li>
+                          <li><a href="#geofence-sharon-study" ><i class="fa fa-book"></i><br />Study</a></li>
+                          <li><a href="#geofence-sharon-active" ><i class="fa fa-futbol-o"></i><br />Activities</a></li>
+                          <li><a href="#geofence-sharon-fun" ><i class="fa fa-rocket"></i><br/>Fun</a></li>
+                        </ul>
+                      </div>
+                      <div id="geofence-sharon-place">
+                        <ul data-role="listview" data-inset="true">
+                          <li>
+                            <a href="#">
+                              <h2>School&nbsp;<i class="fa fa-exclamation-circle" style="color:#FA7470"></i></h2>
+                              <p style="color:#FA7470">Absent from football practice 3:00pm~4:00p</p>
+                              <p style="color:#FA7470">Geofence name: football practice</p>
+                              <p style="color:#FA7470">Location: 236 12th Ave, San Francisco</p>
+                            </a>
+                          </li>
+                          <li><a href="#"><h2>Swimming Class</h2><p>Geofence name:swim team</p><p>Location:875 Hyde Street, SF</p></a></li>
+                          <li><a href="#"><h2>Home</h2><p>Geofence name:home</p><p>Location:645 Bush Street, SF</p></a></li>
+                        </ul>
+                      </div>
+                      <div id="geofence-sharon-study">
+                        <ul data-role="listview" data-inset="true">
+                          <li>
+                            <a href="#">
+                              <h2>School</h2>
+                              <p>Geofence: Study group</p>
+                              <p>Location: 236 12th Ave, San Francisco</p>
+                            </a>
+                          </li>
+                          <li><a href="#"><h2>Abbey's house</h2><p>Geofence name: Study with Abbey</p><p>Location: 875 Hyde Street, SF</p></a></li>
+                          <li><a href="#"><h2>Uncle's house</h2><p>Geofence name: Visit Uncle</p><p>Location: 645 Bush Street, SF</p></a></li>
+                        </ul>
+                      </div>
+                      <div id="geofence-sharon-active">
+                        <ul data-role="listview" data-inset="true">
+                          <li>
+                            <a href="#">
+                              <h2>Golden gate park<i class="fa fa-exclamation-circle" style="color:#FA7470"></i></h2>
+                              <p style="color:#FA7470">Out of geofence 3:00pm~4:00p</p>
+                              <p style="color:#FA7470">Location: 1900 geary ave, San francisco (3:00pm-4:00pm)</p>
+                            </a>
+                          </li>
+                          <li><a href="#"><h2>Movie:Big Hero 6</h2><p>Geofence name:AMC </p><p>Location:4th&Mission Street, SF</p></a></li>
+                          <li><a href="#"><h2>Birthday Party</h2><p>Geofence name:Lily's house</p><p>Location:645 Turk Street, SF</p></a></li>
+                        </ul>
+                      </div>
+                      <div id="geofence-sharon-fun">
+                        <ul data-role="listview" data-inset="true">
+                          <li>
+                            <a href="#">
+                              <h2>Shopping with friends</h2>
+                              <p >Geofence:Nordstorm shopping mall</p>
+                              <p >Location:845 market street, San francisco</p>
+                            </a>
+                          </li>
+                          <li><a href="#"><h2>Play Just Dance in the mall</h2><p>Geofence name:Westfiled Shopping mall</p><p>Location:845 market street, SF</p></a></li>
+                          <li><a href="#"><h2>Dinner:Abbey+Lily</h2><p>Geofence name:Osha Thai </p><p>Location:54 2nd Street, SF</p></a></li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                  <div id="geofence-add-child" a href="add_child.html">
+
+                  </div>
+                </div>
+              </div>
+              <div data-role="footer" id="bot_nav" data-position="fixed">
+                <div data-role="navbar" data-iconpos="top">
+                  <ul id="nav_bar">
+                    <li><a href="index.html" onclick="window.location.href = 'index.html';"><i class="fa fa-street-view"></i><br> Location</a></li>
+                    <li><a href="#geofence" class='active'><i class="fa fa-map-marker"></i><br> Geofence</a></li>
+                    <li><a href="task_annie_to_do.html" onclick="window.location.href='task_annie_to_do.html';"><i class="fa fa-plus"></i><br> Add geofence</a></li>                    
+                    <li><a href="#setting"><i class="fa fa-cog"></i><br> Setting</a></li>
+                  </ul>
+                </div><!-- /navbar -->
+              </div>       
+            </section>
+            <!--#geofence-->
+          </div>
+          <!--div data-role="page" id="task">
+            <!--#Todo>   
+            <section>
+              <div data-role="header" id="headertest" class="jqm-demos ui-responsive-panel" id="panel-responsive-page1" data-title="Panel responsive page" data-url="panel-responsive-page1">
+                <img src='img/teentalogo180x180.png' alt='Teenta logo' class="teenta-logo">
+                <h3>TeenTa</h3>
+                <a href="add_child.html" onclick="window.location.href = 'add_child.html'" class='ui-btn-right add-child'><i class="fa fa-plus"></i></a>
+              </div>
+
+              <div data-role="content" >
+                <div data-role="tabs" id="task-tabs">
+                  <div id="nav-wrapper">
+                    <input name="password" id="search" value="" placeholder="Search name" type="search">
+                    <div data-role="navbar">
+                      <ul>
+                        <li><a href="#task-annie" data-ajax="false" class="ui-btn-active">Annie</a><div class="arrow-up"></div></li>
+                        <li><a href="#task-daniel" data-ajax="false">Daniel</a><div class="arrow-up"></div></li>
+                        <li><a href="#task-sharon" data-ajax="false">Sharon</a><div class="arrow-up"></div></li>
+
+                      </ul>
+                    </div>
+                  </div>
+                  <div id="task-annie" class="ui-body-d ui-content centeralgin">
+                    <img src="img/sharonTodo.png">
+                    <p style="margin:0" >Annie</p>
+                    <div data-role="tabs">
+                      <div data-role="navbar" class="sec-navbar">
+                        <ul class="kidstodo">
+                          <li><a href="#task-annie-pending" data-ajax="false"><i class="fa fa-book"></i> <br />Pending</a></li>
+                          <li><a href="#task-annie-achieved" data-ajax="false" ><i class="fa fa-archive"></i><br />Achieved</a></li>
+                          <li><a href="#task-annie-reward" data-ajax="false"><i class="fa fa-gift"></i><br />Reward</a></li>
+                          <li><a href="#" onclick="window.location.href = 'task_annie_to_do.html';"><i class="fa fa-rocket"></i><br />Add to-do</a></li>
+                        </ul>
+                      </div>
+                      <div id="task-annie-pending" class="task-listview">
+                        <ul data-role="listview" data-inset="true">
+                          <li>
+                            <a href="#">
+                              <div class="tasklabel">Dance Class</div>
+                              <div class="center-block taskicon"><i class="fa fa-gift greemcolor"></i><br/>$ 5</div>
+                              <div class="center-block taskicon"><i class="fa fa-clock-o greemcolor"></i><br/>ONCE</div>
+                              <div class="center-block taskicon"><i class="fa fa-calendar greemcolor"></i><br />THU</div>
+                            </a>
+                          </li>
+                          <li>
+                            <a href="#">
+                              <div class="tasklabel">Clean Her Room</div>
+                              <div class="center-block taskicon"><i class="fa fa-gift greemcolor"></i><br/>$ 5</div>
+                              <div class="center-block taskicon"><i class="fa fa-clock-o greemcolor"></i><br/>ONCE</div>
+                              <div class="center-block taskicon"><i class="fa fa-calendar greemcolor"></i> <i class="fa fa-info-circle redcolor"></i>
+                                <br />THU</div>
+                              </a>
+                            </li>
+                            <li>
+                              <a href="#">
+                                <div class="tasklabel">Help Dust</div>
+                                <div class="center-block taskicon"><i class="fa fa-gift greemcolor"></i><br/>$ 5</div>
+                                <div class="center-block taskicon"><i class="fa fa-clock-o greemcolor"></i><br/>ONCE</div>
+                                <div class="center-block taskicon"><i class="fa fa-calendar greemcolor"></i> <i class="fa fa-info-circle redcolor"></i>
+                                  <br/>SAT</div>
+                                </a>
+                              </li>
+                            </ul>
+                          </div>   
+                          <div id="task-annie-achieved" class="task-listview">
+                            <ul data-role="listview" data-inset="true">
+                              <li>
+                                <a href="#">
+                                  <div class="tasklabel">Dance Class</div>
+                                  <div class="center-block taskicon"><i class="fa fa-gift greemcolor"></i><br/>$ 5</div>
+                                  <div class="center-block taskicon"><i class="fa fa-clock-o greemcolor"></i><br/>ONCE</div>
+                                  <div class="center-block taskicon"><i class="fa fa-calendar greemcolor"></i><br />THU</div>
+                                </a>
+                              </li>
+                              <li>
+                                Total <span class="ui-li-count">$ 5</span>
+                              </li>
+                            </ul>
+                          </div>
+                          <div id="task-annie-reward" class="task-listview">
+                            <ul data-role="listview" data-inset="true">
+                              <li>
+                                <a href="#">
+                                  <div class="tasklabel">
+                                    Harry Potter DVD<br />
+                                    <i class="fa fa-user bluecolor"></i> Sent by Annie
+                                  </div>
+                                  <div class="center-block taskicon"><i class="fa fa-gift greemcolor"></i><br/>$ 15</div>
+                                </a>
+                              </li>
+                              <li>
+                                <a href="#">
+                                  <div class="tasklabel">
+                                    Movie night with friends<br />
+                                    <i class="fa fa-user bluecolor"></i> Sent by Annie
+                                  </div>
+                                  <div class="center-block taskicon"><i class="fa fa-gift greemcolor"></i><br/>$ 20</div>
+                                </a>
+                              </li>
+                              <li>
+                                <a href="add_reward.html" onclick="window.location.href = 'add_reward.html';">
+                                  <i class="fa fa-plus-circle"></i> Add Another Reward
+                                </a>
+                              </li>
+                            </ul>
+                          </div>
+                        </div>
+                      </div>
+
+
+
+                      <div id="task-daniel" class="ui-body-d ui-content centeralgin">
+                        <img src="img/danielTodo.png">
+                        <p style="margin:0" >Daniel</p>
+                        <div data-role="tabs">
+                          <div data-role="navbar" class="sec-navbar">
+                            <ul class="kidstodo">
+                              <li><a href="#task-daniel-pending" data-ajax="false"><i class="fa fa-book"></i> <br />Pending</a></li>
+                              <li><a href="#task-daniel-achieved" data-ajax="false" ><i class="fa fa-archive"></i><br />Achieved</a></li>
+                              <li><a href="#task-daniel-reward" data-ajax="false"><i class="fa fa-gift"></i><br />Reward</a></li>
+                              <li><a href="#" onclick="window.location.href = 'task_annie_to_do.html';"><i class="fa fa-rocket"></i><br />Add to-do</a></li>
+                            </ul>
+                          </div>
+                          <div id="task-daniel-pending" class="task-listview">
+                            <ul data-role="listview" data-inset="true">
+                              <li>
+                                <a href="#">
+                                  <div class="tasklabel">Practice Football</div>
+                                  <div class="center-block taskicon"><i class="fa fa-gift greemcolor"></i><br/>$ 5</div>
+                                  <div class="center-block taskicon"><i class="fa fa-clock-o greemcolor"></i><br/>ONCE</div>
+                                  <div class="center-block taskicon"><i class="fa fa-calendar greemcolor"></i><br />THU</div>
+                                </a>
+                              </li>
+                              <li>
+                                <a href="#">
+                                  <div class="tasklabel">Clean Her Room</div>
+                                  <div class="center-block taskicon"><i class="fa fa-gift greemcolor"></i><br/>$ 5</div>
+                                  <div class="center-block taskicon"><i class="fa fa-clock-o greemcolor"></i><br/>ONCE</div>
+                                  <div class="center-block taskicon"><i class="fa fa-calendar greemcolor"></i> <i class="fa fa-info-circle redcolor"></i>
+                                    <br />THU</div>
+                                  </a>
+                                </li>
+                              </ul>
+                            </div>   
+                            <div id="task-daniel-achieved" class="task-listview">
+                              <ul data-role="listview" data-inset="true">
+                                <li>
+                                  <a href="#">
+                                    <div class="tasklabel">Swim Practice</div>
+                                    <div class="center-block taskicon"><i class="fa fa-gift greemcolor"></i><br/>$ 5</div>
+                                    <div class="center-block taskicon"><i class="fa fa-clock-o greemcolor"></i><br/>ONCE</div>
+                                    <div class="center-block taskicon"><i class="fa fa-calendar greemcolor"></i><br />THU</div>
+                                  </a>
+                                </li>
+                                <li>
+                                  Total <span class="ui-li-count">$ 5</span>
+                                </li>
+                              </ul>
+                            </div>
+                            <div id="task-daniel-reward" class="task-listview">
+                              <ul data-role="listview" data-inset="true">
+                                <li>
+                                  <a href="#">
+                                    <div class="tasklabel">
+                                      Harry Potter DVD<br />
+                                      <i class="fa fa-user bluecolor"></i> Sent by Annie
+                                    </div>
+                                    <div class="center-block taskicon"><i class="fa fa-gift greemcolor"></i><br/>$ 15</div>
+                                  </a>
+                                </li>
+                                <li>
+                                  <a href="#">
+                                    <div class="tasklabel">
+                                      Movie night with friends<br />
+                                      <i class="fa fa-user bluecolor"></i> Sent by Annie
+                                    </div>
+                                    <div class="center-block taskicon"><i class="fa fa-gift greemcolor"></i><br/>$ 20</div>
+                                  </a>
+                                </li>
+                                <li>
+                                  <a href="#">
+                                    <i class="fa fa-plus-circle"></i> Add Another Reward
+                                  </a>
+                                </li>
+                              </ul>
+                            </div>
+                          </div>
+
+                        </div>
+                        <div id="task-sharon" class="ui-body-d ui-content centeralgin">
+                          <img src="img/annieTodo.png">
+                          <p style="margin:0" >Sharon</p>
+                          <div data-role="tabs">
+                            <div data-role="navbar" class="sec-navbar">
+                              <ul class="kidstodo">
+                                <li><a href="#task-sharon-pending" data-ajax="false"><i class="fa fa-book"></i> <br />Pending</a></li>
+                                <li><a href="#task-sharon-achieved" data-ajax="false" ><i class="fa fa-archive"></i><br />Achieved</a></li>
+                                <li><a href="#task-sharon-reward" data-ajax="false"><i class="fa fa-gift"></i><br />Reward</a></li>
+                                <li><a href="#" onclick="window.location.href = 'task_annie_to_do.html';"><i class="fa fa-rocket"></i><br />Add to-do</a></li>
+                              </ul>
+                            </div>
+                            <div id="task-sharon-pending" class="task-listview">
+                              <ul data-role="listview" data-inset="true">
+                                <li>
+                                  <a href="#">
+                                    <div class="tasklabel">Brush Teeth</div>
+                                    <div class="center-block taskicon"><i class="fa fa-gift greemcolor"></i><br/>$ 5</div>
+                                    <div class="center-block taskicon"><i class="fa fa-clock-o greemcolor"></i><br/>ONCE</div>
+                                    <div class="center-block taskicon"><i class="fa fa-calendar greemcolor"></i><br />THU</div>
+                                  </a>
+                                </li>
+                                <li>
+                                  <a href="#">
+                                    <div class="tasklabel">Clean Her Room</div>
+                                    <div class="center-block taskicon"><i class="fa fa-gift greemcolor"></i><br/>$ 5</div>
+                                    <div class="center-block taskicon"><i class="fa fa-clock-o greemcolor"></i><br/>ONCE</div>
+                                    <div class="center-block taskicon"><i class="fa fa-calendar greemcolor"></i> <i class="fa fa-info-circle redcolor"></i>
+                                      <br />THU</div>
+                                    </a>
+                                  </li>
+                                  <li>
+                                    <a href="#">
+                                      <div class="tasklabel">Help Dust</div>
+                                      <div class="center-block taskicon"><i class="fa fa-gift greemcolor"></i><br/>$ 5</div>
+                                      <div class="center-block taskicon"><i class="fa fa-clock-o greemcolor"></i><br/>ONCE</div>
+                                      <div class="center-block taskicon"><i class="fa fa-calendar greemcolor"></i> <i class="fa fa-info-circle redcolor"></i>
+                                        <br />SAT</div>
+                                      </a>
+                                    </li>
+                                  </ul>
+                                </div>   
+                                <div id="task-sharon-achieved" class="task-listview">
+                                  <ul data-role="listview" data-inset="true">
+                                    <li>
+                                      <a href="#">
+                                        <div class="tasklabel">Swim Practice</div>
+                                        <div class="center-block taskicon"><i class="fa fa-gift greemcolor"></i><br/>$ 5</div>
+                                        <div class="center-block taskicon"><i class="fa fa-clock-o greemcolor"></i><br/>ONCE</div>
+                                        <div class="center-block taskicon"><i class="fa fa-calendar greemcolor"></i><br />THU</div>
+                                      </a>
+                                    </li>
+                                    <li>
+                                      Total <span class="ui-li-count">$ 5</span>
+                                    </li>
+                                  </ul>
+                                </div>
+                                <div id="task-sharon-reward" class="task-listview">
+                                  <ul data-role="listview" data-inset="true">
+                                    <li>
+                                      <a href="#">
+                                        <div class="tasklabel">
+                                          Harry Potter DVD<br />
+                                          <i class="fa fa-user bluecolor"></i> Sent by Annie
+                                        </div>
+                                        <div class="center-block taskicon"><i class="fa fa-gift greemcolor"></i><br/>$ 15</div>
+                                      </a>
+                                    </li>
+                                    <li>
+                                      <a href="#">
+                                        <div class="tasklabel">
+                                          Movie night with friends<br />
+                                          <i class="fa fa-user bluecolor"></i> Sent by Annie
+                                        </div>
+                                        <div class="center-block taskicon"><i class="fa fa-gift greemcolor"></i><br/>$ 20</div>
+                                      </a>
+                                    </li>
+                                    <li>
+                                      <a href="#">
+                                        <i class="fa fa-plus-circle"></i> Add Another Reward
+                                      </a>
+                                    </li>
+                                  </ul>
+                                </div>
+                              </div>
+
+                            </div>
+                            <div id="task-add-child">
+                            </div>
+                          </div>
+                        </div>
+                        <div data-role="footer" id="bot_nav" data-position="fixed">
+                          <div data-role="navbar" data-iconpos="top">
+                            <ul id="nav_bar">
+                              <li><a href="index.html" onclick="window.location.href = 'index.html';"><i class="fa fa-street-view"></i><br> Location</a></li>
+                              <li><a href="#geofence"><i class="fa fa-map-marker"></i><br> Geofence</a></li>
+                              <li><a href="#task" class='active'><i class="fa fa-check-circle"></i><br> To-Do</a></li>
+                              <li><a href="#setting"><i class="fa fa-cog"></i><br> Setting</a></li>
+                            </ul>
+                          </div><!-- /navbar>
+                        </div>  
+                      </section>  
+                    </div-->
+
+
+
+                    <!--setting-->
+                    <div data-role="page" id="setting">
+                      <section >
+                        <div data-role="header" id="headertest" class="jqm-demos ui-responsive-panel" id="panel-responsive-page1" data-title="Panel responsive page" data-url="panel-responsive-page1">
+                          <img src='img/teentalogo180x180.png' alt='Teenta logo' class="teenta-logo">
+                          <h3>Setting</h3>
+                          <a href="add_child.html" onclick="window.location.href = 'add_child.html'" class='ui-btn-right add-child'><i class="fa fa-user-plus"></i></a>
+                        </div>
+
+                        <div data-role="content">
+
+
+                          <ul data-role="listview" data-inset="true">
+                            <li><a href="#kathyprofile"><img src="img/kathy2.png" id="setting_parent"><h2>Kathy</h2><p>kathyjohnson@gmail.com</p></a></li>
+                            <li><a href="#mapsetting">Map option</a></li>
+                            <li><a href="#geofence_notification">Geofence</a></li>
+                            <li><a href="#taskandreward">Task and reward reminders</a></li>
+                            <li><a href="#account">Account</a></li>
+                          </ul>
+                        </div>
+                        <div data-role="footer" id="bot_nav" data-position="fixed">
+                          <div data-role="navbar" data-iconpos="top">
+                            <ul id="nav_bar">
+                              <li><a href="index.html" onclick="window.location.href = 'index.html';"><i class="fa fa-street-view"></i><br>Location</a></li>
+                              <li><a href="#geofence"><i class="fa fa-map-marker"></i><br> Geofence</a></li>
+                              <li><a href="task_annie_to_do.html" onclick="window.location.href='task_annie_to_do.html';"><i class="fa fa-plus"></i><br> Add geofence</a></li>                    
+                              <li><a href="#setting" class='active'><i class="fa fa-cog"></i><br> Setting</a></li>
+                            </ul>
+                          </div><!-- /navbar -->
+                        </div>  
+                      </section>
+                    </div>
+                    <div data-role="page" id="mapsetting">
+                      <!--mapsetting-->	
+                      <section >
+                        <div data-role="header" id="headertest" class="jqm-demos ui-responsive-panel" id="panel-responsive-page1" data-title="Panel responsive page" data-url="panel-responsive-page1">
+
+                          <h3>Map Setting</h3>
+                          <a href="#setting" class="ui-btn-left ui-btn ui-btn-inline ui-corner-all ui-btn-icon-left ui-icon-arrow-l ui-btn-icon-notext" id="add_to_do_down_arrow2"></a>
+                          <a href="add_child.html" onclick="window.location.href = 'add_child.html'" class='ui-btn-right add-child'><i class="fa fa-user-plus"></i></a>
+                        </div>
+                        <div data-role="content" id="setting_content">
+
+                          <ul data-role="listview" id="settinglist" data-inset="true">
+                            <li data-icon="false"><a href="#">Hospitals
+                              <span class="ui-li-count">
+                                <select name="slider-flip-m" id="slider-flip-m" data-role="slider" data-mini="true"><option value="off">No</option><option value="on" selected="">Yes</option></select>
+                              </span>
+                            </a>
+                          </li>
+                          <li date-icon="false">Police Station<span class="ui-li-count">
+                            <select name="slider-flip-m" id="slider-flip-m" data-role="slider" data-mini="true"><option value="off">No</option><option value="on" selected="">Yes</option></select>
+                          </span>
+                        </a>
+                      </li>
+                      <li>Sex Offenders<span class="ui-li-count">
+                        <select name="slider-flip-m" id="slider-flip-m" data-role="slider" data-mini="true"><option value="off">No</option><option value="on" selected="">Yes</option></select>
+                      </span>
+                    </a>
+                  </li>
+                  <li>Crime<span class="ui-li-count">
+                    <select name="slider-flip-m" id="slider-flip-m" data-role="slider" data-mini="true"><option value="off">No</option><option value="on" selected="">Yes</option></select>
+                  </span>
+                </a>
+              </li>
+            </ul>
+          </div>
+          <div data-role="footer" id="bot_nav" data-position="fixed">
+            <div data-role="navbar" data-iconpos="top">
+              <ul id="nav_bar">
+                <li><a href="index.html" onclick="window.location.href = 'index.html';"><i class="fa fa-street-view"></i><br>Location</a></li>
+                <li><a href="#geofence"><i class="fa fa-map-marker"></i><br> Geofence</a></li>
+                <li><a href="task_annie_to_do.html" onclick="window.location.href='task_annie_to_do.html';"><i class="fa fa-plus"></i><br> Add geofence</a></li>                    
+                <li><a href="#setting"><i class="fa fa-cog"></i><br> Setting</a></li>
+              </ul>
+            </div><!-- /navbar -->
+          </div>  
+        </section>
+      </div>
+      <!--geofence-->
+      <div data-role="page" id="geofence_notification">
+        <section>
+          <div data-role="header" id="headertest" class="jqm-demos ui-responsive-panel" id="panel-responsive-page1" data-title="Panel responsive page" data-url="panel-responsive-page1">
+
+
+            <h3>Geofence</h3>
+            <a href="#setting" class="ui-btn-left ui-btn ui-btn-inline ui-corner-all ui-btn-icon-left ui-icon-arrow-l ui-btn-icon-notext" id="add_to_do_down_arrow2"></a>
+            <a href="add_child.html" onclick="window.location.href = 'add_child.html'" class='ui-btn-right add-child'><i class="fa fa-user-plus"></i></a> 
+          </div>
+          <div data-role="content" id="setting_content">
+
+            <ul data-role="listview" id="settinglist" data-inset="true">
+              <li data-icon="false"><a href="#">Email
+                <span class="ui-li-count">
+                  <select name="slider-flip-m" id="slider-flip-m" data-role="slider" data-mini="true"><option value="off">No</option><option value="on" selected="">Yes</option></select>
+                </span>
+              </a>
+            </li>
+            <li date-icon="false">Push Notification<span class="ui-li-count">
+              <select name="slider-flip-m" id="slider-flip-m" data-role="slider" data-mini="true"><option value="off">No</option><option value="on" selected="">Yes</option></select>
+            </span>
+          </a>
+        </li>
+        <li date-icon="false">Text Message<span class="ui-li-count">
+          <select name="slider-flip-m" id="slider-flip-m" data-role="slider" data-mini="true"><option value="off">No</option><option value="on" selected="">Yes</option></select>
+        </span>
+      </a>
+    </li>
+
+  </ul>
+</div>
+<div data-role="footer" id="bot_nav" data-position="fixed">
+  <div data-role="navbar" data-iconpos="top">
+    <ul id="nav_bar">
+      <li><a href="index.html" onclick="window.location.href = 'index.html';"><i class="fa fa-street-view"></i><br>Location</a></li>
+      <li><a href="#geofence"><i class="fa fa-map-marker"></i><br> Geofence</a></li>
+      <li><a href="task_annie_to_do.html" onclick="window.location.href='task_annie_to_do.html';"><i class="fa fa-plus"></i><br> Add geofence</a></li>                    
+      <li><a href="#setting"><i class="fa fa-cog"></i><br> Setting</a></li>
+    </ul>
+  </div><!-- /navbar -->
+</div>  
+</section>
+</div>
+<div data-role="page" id="taskandreward">
+  <!--task and reward alerts-->
+  <section >
+    <div data-role="header" id="headertest" class="jqm-demos ui-responsive-panel" id="panel-responsive-page1" data-title="Panel responsive page" data-url="panel-responsive-page1">
+
+
+     <h3>Task and reward</h3>
+     <a href="#setting" class="ui-btn-left ui-btn ui-btn-inline ui-corner-all ui-btn-icon-left ui-icon-arrow-l ui-btn-icon-notext" id="add_to_do_down_arrow2"></a>
+     <a href="add_child.html" onclick="window.location.href = 'add_child.html'" class='ui-btn-right add-child'><i class="fa fa-user-plus"></i></a>   
+   </div>
+   <div data-role="content" id="setting_content">
+
+    <ul data-role="listview" id="settinglist" data-inset="true">
+      <li data-icon="false"><a href="#">Recieve reminders as they happen
+        <span class="ui-li-count">
+          <select name="slider-flip-m" id="slider-flip-m" data-role="slider" data-mini="true"><option value="off">No</option><option value="on" selected="">Yes</option></select>
+        </span>
+      </a>
+    </li>
+    <li date-icon="false">Recieve reminders once a day<span class="ui-li-count">
+      <select name="slider-flip-m" id="slider-flip-m" data-role="slider" data-mini="true"><option value="off">No</option><option value="on" selected="">Yes</option></select>
+    </span>
+  </a>
+</li>
+<li date-icon="false">Do not remind me<span class="ui-li-count">
+  <select name="slider-flip-m" id="slider-flip-m" data-role="slider" data-mini="true"><option value="off">No</option><option value="on" selected="">Yes</option></select>
+</span>
+</a>
+</li>
+
+</ul>
+</div>
+<div data-role="footer" id="bot_nav" data-position="fixed">
+  <div data-role="navbar" data-iconpos="top">
+    <ul id="nav_bar">
+      <li><a href="index.html" onclick="window.location.href = 'index.html';"><i class="fa fa-street-view"></i><br>Location</a></li>
+      <li><a href="#geofence"><i class="fa fa-map-marker"></i><br> Geofence</a></li>
+      <li><a href="task_annie_to_do.html" onclick="window.location.href='task_annie_to_do.html';"><i class="fa fa-plus"></i><br> Add geofence</a></li>    <li><a href="#setting"><i class="fa fa-cog"></i><br> Setting</a></li>
+    </ul>
+  </div><!-- /navbar -->
+</div>  
+</section>
+
+</div>
+<div data-role="page" id="account">
+  <!--accountsetting-->
+  <section >
+    <div data-role="header" id="headertest" class="jqm-demos ui-responsive-panel" id="panel-responsive-page1" data-title="Panel responsive page" data-url="panel-responsive-page1">
+
+
+      <h3>Account</h3>
+      <a href="#setting" class="ui-btn-left ui-btn ui-btn-inline ui-corner-all ui-btn-icon-left ui-icon-arrow-l ui-btn-icon-notext" id="add_to_do_down_arrow2"></a>
+      <a href="add_child.html" onclick="window.location.href = 'add_child.html'" class='ui-btn-right add-child'><i class="fa fa-user-plus"></i></a>  
+    </div>
+    <div data-role="content" id="setting_content">
+
+
+      <ul data-role="listview" id="settinglist" data-inset="true">
+        <li ><a href="#changepassword">Change password</a></li>
+        <li ><a href="#deleteaccount">Delete account</a></li>
+        <li date-icon="false">Turn on Sounds<span class="ui-li-count">
+          <select name="slider-flip-m" id="slider-flip-m" data-role="slider" data-mini="true"><option value="off">No</option><option value="on" selected="">Yes</option></select>
+        </span>
+      </a>
+    </li>
+
+  </ul>
+</div>
+<div data-role="footer" id="bot_nav" data-position="fixed">
+  <div data-role="navbar" data-iconpos="top">
+    <ul id="nav_bar">
+      <li><a href="index.html" onclick="window.location.href = 'index.html';"><i class="fa fa-street-view"></i><br>Location</a></li>
+      <li><a href="#geofence"><i class="fa fa-map-marker"></i><br> Geofence</a></li>
+      <li><a href="task_annie_to_do.html" onclick="window.location.href='task_annie_to_do.html';"><i class="fa fa-plus"></i><br> Add geofence</a></li>    <li><a href="#setting"><i class="fa fa-cog"></i><br> Setting</a></li>
+    </ul>
+  </div><!-- /navbar -->
+</div>  
+</section>
+</div>
+<div data-role="page" id="changepassword">
+  <!--change password-->
+  <section>
+    <div data-role="header" id="headertest" class="jqm-demos ui-responsive-panel" id="panel-responsive-page1" data-title="Panel responsive page" data-url="panel-responsive-page1">
+
+      <h1>Change Password</h1>
+      <a href="#account" class="ui-btn-left ui-btn ui-btn-inline ui-corner-all ui-btn-icon-left ui-icon-carat-l ui-btn-icon-notext" id="changepassbackarrow"></a>   
+      <a href="#account" class="ui-btn-right ui-btn ui-btn-inline ui-corner-all ui-btn-icon-right ui-icon-check ui-btn-icon-notext" id="confirmpassword"></a>
+    </div>
+    <div data-role="content" id="setting_content">
+      <input type="text" name="text-1" id="text-1" value="current password">
+
+      <input type="text" name="text-1" id="text-1" value="new password"></form> 
+    </div>
+    <div data-role="footer" id="bot_nav" data-position="fixed">
+      <div data-role="navbar" data-iconpos="top">
+        <ul id="nav_bar">
+          <li><a href="index.html" onclick="window.location.href = 'index.html';"><i class="fa fa-street-view"></i> Location</a></li>
+          <li><a href="#geofence"><i class="fa fa-map-marker"></i> Geofence</a></li>
+          <li><a href="task_annie_to_do.html" onclick="window.location.href='task_annie_to_do.html';"><i class="fa fa-plus"></i><br> Add geofence</a></li><li><a href="#setting"><i class="fa fa-cog"></i> Setting</a></li>
+        </ul>
+      </div><!-- /navbar -->
+    </div>  
+  </section>
+</div>
+<div data-role="page" id="kathyprofile">
+  <!--kathy profile-->
+  <section >
+    <div data-role="header" id="headertest" class="jqm-demos ui-responsive-panel" id="panel-responsive-page1" data-title="Panel responsive page" data-url="panel-responsive-page1">
+
+      <h1>My profile</h1>
+
+      <a href="#setting" class="ui-btn-left ui-btn ui-btn-inline ui-corner-all ui-btn-icon-left ui-icon-arrow-l ui-btn-icon-notext" id="add_to_do_down_arrow2"></a>
+      <a href="add_child.html" onclick="window.location.href = 'add_child.html'" class='ui-btn-right add-child'><i class="fa fa-user-plus"></i></a> 
+    </div>
+    <div data-role="content" id="setting_content">
+
+
+      <form>
+        <input type="text" name="text-1" id="text-1" value="kathy"></form>
+        <form>
+          <input type="text" name="text-1" id="text-1" value="kathyjohnson@gmail.com"></form>
+          <form>
+            <input type="text" name="text-1" id="text-1" value="Mom"></form>
+            <form>
+              <input type="text" name="text-1" id="text-1" value="input your password"></form>
+
+            </div>
+            <div data-role="footer" id="bot_nav" data-position="fixed">
+              <div data-role="navbar" data-iconpos="top">
+                <ul id="nav_bar">
+                  <li><a href="index.html" onclick="window.location.href = 'index.html';"><i class="fa fa-street-view"></i> Location</a></li>
+                  <li><a href="#geofence"><i class="fa fa-map-marker"></i> Geofence</a></li>
+                  <li><a href="task_annie_to_do.html" onclick="window.location.href='task_annie_to_do.html';"><i class="fa fa-plus"></i><br> Add geofence</a></li>                    
+                  <li><a href="#setting"><i class="fa fa-cog"></i> Setting</a></li>
+                </ul>
+              </div><!-- /navbar -->
+            </div>  
+          </section>
+        </div>
+      </body>
+      </html>
